@@ -2,7 +2,8 @@
 {
     public class DBQuery
     {
-        public string? User_Logon_Name { get; set; }
-        public string? User_Logon_Name { get; set; }
+        public string? Name { get; set; }
+        public string? Password { get; set; }
+        public string? Query { get; set; }
     }
 }
