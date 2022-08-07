@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DBQuery.Controllers
 {
 
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("[controller]")]
 
@@ -16,14 +16,14 @@ namespace DBQuery.Controllers
         {
             //use Name
             //Console.WriteLine($"Receiving Userinfo: {Name} Querying for {Query}");
-            Console.WriteLine($"Receiving Userinfo: Test Querying for {Query}");
-            /* var url = "http://10.32.8.204:3000";
+            Console.WriteLine($"Receiving Userinfo: UserTest Querying for {Query}");
+            var url = "http://10.32.8.204:3000";
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("servicesParam", "jpjic, jpn, jpj, orangdkhd, oranghilang, kenderaanhilang, personal, saman, jim");
             client.DefaultRequestHeaders.Add("searchParam", $"{Query}");
             var res = await client.GetStringAsync(url);
-            Console.WriteLine(res); */
-            return Ok("test");
+            Console.WriteLine(res);
+            return Ok(res);
         }
     }
 }
