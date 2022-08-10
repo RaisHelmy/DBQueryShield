@@ -23,43 +23,9 @@ namespace DBQuery.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(string Query)
         {
-            //var servicesParam = new string[] { "jpjic", "jpn", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "personal", "saman", "jim" };
-            //string? dbqueryresult = null;
-            //Console.WriteLine($"Receiving Userinfo: UserTest Querying for {Query}");
-            //string url = "http://10.32.8.204:3000";
-
-            /*
-            foreach (var param in servicesParam)
-            {
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("servicesParam", param);
-                client.DefaultRequestHeaders.Add("searchParam", $"{Query}");
-                var res = await client.GetStringAsync(url);
-                dbqueryresult += res;
-            }
-            */
-
-            /*
-            using var client = new HttpClient();
-            //client.Timeout = TimeSpan.FromMinutes(0.5);
-            client.DefaultRequestHeaders.Add("servicesParam", "jpn");
-                client.DefaultRequestHeaders.Add("searchParam", $"{Query}");
-            //var res = await client.GetStreamAsync(url);
-            var res = await client.GetStringAsync(url);
-
-            JsonNode forecastNode = JsonNode.Parse(res)!;
-            var options = new JsonSerializerOptions { WriteIndented = true }; */
-
-            //Console.WriteLine(forecastNode!.ToJsonString(options)); //Print all Response
-            //JsonNode temperatureNode = forecastNode!["QueryStartTime"]!; //Assign QueryStartTime value to JsonNode type variable
-            //Console.WriteLine($"JSON={temperatureNode.ToJsonString()}"); //Print QueryStartTime value from JsonNode Variable > QueryStartTime is assignable in this case meaning all JsonNode is also Assignable
-            //int QueryStartTime_ = (int)forecastNode!["QueryStartTime"]!; //Alternative to JsonNode above
-            //Console.WriteLine($"Value={QueryStartTime_}");
-
-
-            string jsonString =
-    @"{
-    ""Status"": ""tiada"",
+            string resultDBQuery_Asal =
+@"{
+    ""Status"": ""tiadaZ"",
     ""QueryStartTime"": """",
     ""QueryEndTime"": """",
     ""JPN"":
@@ -281,10 +247,58 @@ namespace DBQuery.Controllers
         ],
         ""Types"": []
 }
-";
+"; // tempNode.ToJsonString()}" == "[]" 
+            JsonNode resultDBQuery = JsonNode.Parse(resultDBQuery_Asal)!;
+            /*
+            JsonNode tempNode = resultDBQuery!["Status"]!;
+            resultDBQuery["Status"] = "ada";
+            tempNode = resultDBQuery!["QueryStartTime"]!;
+            tempNode = resultDBQuery["JPN"][0]["ResultStatus"];
+            bool a = String.IsNullOrEmpty(tempNode.ToString()); */
+
+            //Dapatkan data daripada DBQuery
+            var servicesParam = new string[] { "jpjic", "jpn", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "personal", "saman", "jim" };
+            //string? dbqueryresult = null;
+            Console.WriteLine($"Receiving Userinfo: UserTest Querying for {Query}");
+            string url = "http://10.32.8.204:3000";
+
+            /*
+            foreach (var param in servicesParam)
+            {
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("servicesParam", param);
+                client.DefaultRequestHeaders.Add("searchParam", $"{Query}");
+                var res = await client.GetStringAsync(url);
+                dbqueryresult += res;
+            }
+            */
+            
+            
+            using var client = new HttpClient();
+            //client.Timeout = TimeSpan.FromMinutes(0.5);
+            client.DefaultRequestHeaders.Add("servicesParam", "jpn");
+                client.DefaultRequestHeaders.Add("searchParam", $"{Query}");
+            //var res = await client.GetStreamAsync(url);
+            var res = await client.GetStringAsync(url);
+            JsonNode resultDBQuery_proses = JsonNode.Parse(res)!;
+            //resultDBQuery_proses!["Results"]!.ToJsonString;
+
+
+            //var options = new JsonSerializerOptions { WriteIndented = true }; 
+            //Console.WriteLine(forecastNode!.ToJsonString(options)); //Print all Response
+            //JsonNode temperatureNode = forecastNode!["QueryStartTime"]!; //Assign QueryStartTime value to JsonNode type variable
+            //Console.WriteLine($"JSON={temperatureNode.ToJsonString()}"); //Print QueryStartTime value from JsonNode Variable > QueryStartTime is assignable in this case meaning all JsonNode is also Assignable
+            //int QueryStartTime_ = (int)forecastNode!["QueryStartTime"]!; //Alternative to JsonNode above
+            //Console.WriteLine($"Value={QueryStartTime_}");
+
+
+
             // Create a JsonNode DOM from a JSON string.
-            JsonNode forecastNode = JsonNode.Parse(jsonString)!;
-            return Ok(forecastNode);
+            //forecastNode is Json Output
+            //resultDBQuery_proses!["Results"]!.ToJsonString
+            //JsonNode tempNode = resultDBQuery_proses!["Results"]!; 
+            //return Ok($"{tempNode.ToJsonString()}" == "[]");
+            return Ok();
         }
     }
 }
