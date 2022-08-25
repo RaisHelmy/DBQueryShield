@@ -543,9 +543,6 @@ namespace DBQuery.Model
         [JsonPropertyName("Jawatan")]
         public string? Jawatan;
 
-        [JsonPropertyName("Cawangan")]
-        public string? Cawangan;
-
         [JsonPropertyName("Balai")]
         public string? Balai;
 

@@ -24,6 +24,7 @@ namespace DBQuery.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(string Query)
         {
+            Query = Query.ToLower();
             string resultDBQuery_Asal =
 @"{
     ""Status"": ""ada"",
@@ -172,7 +173,7 @@ namespace DBQuery.Controllers
                 ""TypeDescription"": ""Saman""
             }
         ],
-    ""OrangDikehendaki "":
+    ""OrangDikehendaki"":
         [
             {
                 ""ResultStatus"": ""tiada"",
@@ -197,7 +198,7 @@ namespace DBQuery.Controllers
                 ""TypeDescription"": ""Orang Dikehendaki""
             }
         ],
-    ""KenderaanHilang "":
+    ""KenderaanHilang"":
         [
             {
                 ""ResultStatus"": ""tiada"",
@@ -223,7 +224,7 @@ namespace DBQuery.Controllers
                 ""TypeDescription"": ""KenderaanHilang""
             }
         ],
-    ""Personel "":
+    ""Personel"":
         [
             {
                 ""ResultStatus"": ""tiada"",
@@ -235,7 +236,6 @@ namespace DBQuery.Controllers
                 ""Bangsa/Keturunan"": """",
                 ""Pangkat Hakiki"": """",
                 ""Jawatan"": """",
-                ""Cawangan"": """",
                 ""Balai"": """",
                 ""Daerah"": """",
                 ""Kontigen"": """",
@@ -250,6 +250,7 @@ namespace DBQuery.Controllers
 }
 "; // tempNode.ToJsonString()}" == "[]" 
             JsonNode resultDBQuery = JsonNode.Parse(resultDBQuery_Asal)!;
+            JsonNode resultDBQuery0 = JsonNode.Parse(resultDBQuery_Asal)!;
             /*
             JsonNode tempNode = resultDBQuery!["Status"]!;
             resultDBQuery["Status"] = "ada";
@@ -259,7 +260,8 @@ namespace DBQuery.Controllers
 
             //Dapatkan data daripada DBQuery
             //var servicesParam = new string[] { "jpn", "jpjic",  "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "personal", "saman", "jim" };
-            string[] servicesParam = { "jpn" }; //, "jpjic", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "kenderaanhilang", "personal", "saman", "jim" };
+            // BAHAYA!!!!!!! "kenderaanhilang" jpjic // JAAANGANNN GUNA NI : SAMAN 
+            string[] servicesParam = { "jpn", "jpj" }; //, "oranghilang", "kenderaanhilang", "personal", "jim" }; //, "jpjic", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "kenderaanhilang", "personal", "saman", "jim" };
             //var servicesParam = new string[] { "jpn" };
             //string? dbqueryresult = null;
             Console.WriteLine($"Receiving Userinfo: UserTest Querying for {Query}");
@@ -317,6 +319,7 @@ namespace DBQuery.Controllers
             JsonNode? resultDBQuery_proses = null;
             //string? tempStr = null;
 
+            /*
             using var client = new HttpClient();
             //client.Timeout = TimeSpan.FromMinutes(0.5);
             client.DefaultRequestHeaders.Add("servicesParam", "jpn");
@@ -327,8 +330,10 @@ namespace DBQuery.Controllers
             //resultDBQuery_proses!["Results"]!.ToJsonString;
             //tempNode = resultDBQuery_proses["Results"][0]["Nama"];
             //resultDBQuery["JPN"][0]["Nama"] = tempNode;
+            //string temp = resultDBQuery_proses["Results"].ToJsonString();//.ToJsonString();
 
-            resultDBQuery["Status"] = "ada";
+            if (resultDBQuery0["Types"].ToString() != resultDBQuery_proses["Results"].ToString()) { 
+                resultDBQuery["Status"] = "ada";
             resultDBQuery["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
             resultDBQuery["JPN"][0]["ResultStatus"] = "ada";
             resultDBQuery["JPN"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
@@ -356,8 +361,9 @@ namespace DBQuery.Controllers
             }
             string? base64input = Convert.ToBase64String(bytes);
             resultDBQuery["JPN"][0]["Photo"] = base64input;
-
-            /* Loop Start
+            }
+            */
+            JsonNode? tempspresponse = null;
             foreach (var sp in servicesParam)
             {
                 using var client = new HttpClient();
@@ -370,9 +376,16 @@ namespace DBQuery.Controllers
                 //resultDBQuery_proses!["Results"]!.ToJsonString;
                 //tempNode = resultDBQuery_proses["Results"][0]["Nama"];
                 //resultDBQuery["JPN"][0]["Nama"] = tempNode;
-                switch (sp)
+                if (sp == "personal")
                 {
-                    case "jpn":
+                    tempspresponse = resultDBQuery_proses;
+                }
+
+                if (resultDBQuery0["Types"].ToString() != resultDBQuery_proses["Results"].ToString())
+                {
+                    switch (sp)
+                    {
+                        case "jpn":
                             resultDBQuery["Status"] = "ada";
                             resultDBQuery["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
                             resultDBQuery["JPN"][0]["ResultStatus"] = "ada";
@@ -401,176 +414,169 @@ namespace DBQuery.Controllers
                             }
                             string? base64input = Convert.ToBase64String(bytes);
                             resultDBQuery["JPN"][0]["Photo"] = base64input;
-                        break;
-                    case "jpjic":
-                        resultDBQuery["Status"] = "ada";
-                        resultDBQuery["JPJIC"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["JPJIC"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["JPJIC"][0]["No.Kenderaan"] = resultDBQuery_proses["Results"][0]["No.Kenderaan"].ToString();
-                        resultDBQuery["JPJIC"][0]["Model"] = resultDBQuery_proses["Results"][0]["Model"].ToString();
-                        resultDBQuery["JPJIC"][0]["Tarikh Model"] = resultDBQuery_proses["Results"][0]["Tarikh Model"].ToString();
-                        resultDBQuery["JPJIC"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["JPJIC"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        resultDBQuery["JPJIC"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        break;
-                    case "jpj":
-                        resultDBQuery["JPJ"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["JPJ"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["JPJ"][0]["No KP/Paspot"] = resultDBQuery_proses["Results"][0]["No KP/Paspot"].ToString();
-                        resultDBQuery["JPJ"][0]["Kategori"] = resultDBQuery_proses["Results"][0]["Kategori"].ToString();
-                        resultDBQuery["JPJ"][0]["Alamat"] = resultDBQuery_proses["Results"][0]["Alamat"].ToString();
-                        resultDBQuery["JPJ"][0]["No Pendaftaran Lama"] = resultDBQuery_proses["Results"][0]["No Pendaftaran Kenderaan"].ToString();
-                        resultDBQuery["JPJ"][0]["No Chasis"] = resultDBQuery_proses["Results"][0]["No Chasis"].ToString();
-                        resultDBQuery["JPJ"][0]["Jenis Badan"] = resultDBQuery_proses["Results"][0]["Jenis Badan"].ToString();
-                        resultDBQuery["JPJ"][0]["No Enjin"] = resultDBQuery_proses["Results"][0]["No Enjin"].ToString();
-                        resultDBQuery["JPJ"][0]["Kuasa Enjin"] = resultDBQuery_proses["Results"][0]["Kuasa Enjin"].ToString();
-                        resultDBQuery["JPJ"][0]["Model"] = resultDBQuery_proses["Results"][0]["Model"].ToString();
-                        resultDBQuery["JPJ"][0]["Tahun Keluaran Model"] = resultDBQuery_proses["Results"][0]["Tahun Keluaran Model"].ToString();
-                        resultDBQuery["JPJ"][0]["Warna"] = resultDBQuery_proses["Results"][0]["Warna"].ToString();
-                        resultDBQuery["JPJ"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
-                        resultDBQuery["JPJ"][0]["Kod Kegunaan"] = resultDBQuery_proses["Results"][0]["Kod Kegunaan"].ToString();
-                        resultDBQuery["JPJ"][0]["Tarikh Daftar"] = resultDBQuery_proses["Results"][0]["Tarikh Daftar"].ToString();
-                        resultDBQuery["JPJ"][0]["No LKM"] = resultDBQuery_proses["Results"][0]["No LKM"].ToString();
-                        resultDBQuery["JPJ"][0]["Tempoh LKM"] = resultDBQuery_proses["Results"][0]["Tempoh LKM"].ToString();
-                        resultDBQuery["JPJ"][0]["Syarikat Insurans"] = resultDBQuery_proses["Results"][0]["Syarikat Insurans"].ToString();
-                        resultDBQuery["JPJ"][0]["No Polisi"] = resultDBQuery_proses["Results"][0]["No Polisi"].ToString();
-                        resultDBQuery["JPJ"][0]["Tempoh Insurans"] = resultDBQuery_proses["Results"][0]["Tempoh Insurans"].ToString();
-                        resultDBQuery["JPJ"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["JPJ"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    case "orangdkhd":
-                        resultDBQuery["OrangDikehendaki"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["OrangDikehendaki"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["No.Laporan"] = resultDBQuery_proses["Results"][0]["No.Laporan"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["IPD"] = resultDBQuery_proses["Results"][0]["IPD"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Kontinjen"] = resultDBQuery_proses["Results"][0]["Kontinjen"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Akta Kesalahan"] = resultDBQuery_proses["Results"][0]["Akta Kesalahan"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Photo"] = resultDBQuery_proses["Results"][0]["Photo"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Pegawai Penyiasat"] = resultDBQuery_proses["Results"][0]["Pegawai Penyiasat"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Tarikh Report"] = resultDBQuery_proses["Results"][0]["Tarikh Report"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        resultDBQuery["OrangDikehendaki"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        strInput = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
-                        bytes = new byte[strInput.Length / 2];
-                        for (var i = 0; i < bytes.Length; i++)
-                        {
-                            bytes[i] = Convert.ToByte(strInput.Substring(i * 2, 2), 16);
-                        }
-                        base64input = Convert.ToBase64String(bytes);
-                        resultDBQuery["OrangDikehendaki"][0]["PhotoHex"] = base64input;
-                        break;
-                    case "oranghilang":
-                        resultDBQuery["OrangHilang"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["OrangHilang"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Bangsa"] = resultDBQuery_proses["Results"][0]["Bangsa"].ToString();
-                        resultDBQuery["OrangHilang"][0]["No Laporan"] = resultDBQuery_proses["Results"][0]["No Laporan"].ToString();
-                        resultDBQuery["OrangHilang"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Gambar"] = resultDBQuery_proses["Results"][0]["Gambar"].ToString();
-                        resultDBQuery["OrangHilang"][0]["Balai Polis"] = resultDBQuery_proses["Results"][0]["Balai Polis"].ToString();
-                        resultDBQuery["OrangHilang"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["OrangHilang"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    case "kenderaanhilang":
-                        resultDBQuery["KenderaanHilang"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["KenderaanHilang"][0]["No.Laporan"] = resultDBQuery_proses["Results"][0]["No.Laporan"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Balai"] = resultDBQuery_proses["Results"][0]["Balai"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Jenis"] = resultDBQuery_proses["Results"][0]["Jenis"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Model/Tahun Buatan"] = resultDBQuery_proses["Results"][0]["Model/Tahun Buatan"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Warna"] = resultDBQuery_proses["Results"][0]["Warna"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Pegawai Penyiasat"] = resultDBQuery_proses["Results"][0]["Pegawai Penyiasat"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["No Pendaftaran Kenderaan"] = resultDBQuery_proses["Results"][0]["No Pendaftaran Kenderaan"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["No Chasis"] = resultDBQuery_proses["Results"][0]["No Chasis"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["No Enjin"] = resultDBQuery_proses["Results"][0]["No Enjin"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Recovery Indicator"] = resultDBQuery_proses["Results"][0]["Recovery Indicator"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Recovery Report No"] = resultDBQuery_proses["Results"][0]["Recovery Report No"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Interim"] = resultDBQuery_proses["Results"][0]["Interim"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["Kenderaan Dicuri Di Malaysia"] = resultDBQuery_proses["Results"][0]["Kenderaan Dicuri Di Malaysia"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["KenderaanHilang"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    case "personal":
-                        resultDBQuery["Personel"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["Personeln"][0]["Name"] = resultDBQuery_proses["Results"][0]["Name"].ToString();
-                        resultDBQuery["Personel"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
-                        resultDBQuery["Personel"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
-                        resultDBQuery["Personel"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                        resultDBQuery["Personel"][0]["Bangsa/Keturunan"] = resultDBQuery_proses["Results"][0]["Bangsa/Keturunan"].ToString();
-                        resultDBQuery["Personel"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
-                        resultDBQuery["Personel"][0]["Pangkat Hakiki"] = resultDBQuery_proses["Results"][0]["Pangkat Hakiki"].ToString();
-                        resultDBQuery["Personel"][0]["Jawatan"] = resultDBQuery_proses["Results"][0]["Jawatan"].ToString();
-                        resultDBQuery["Personel"][0]["Cawangan"] = resultDBQuery_proses["Results"][0]["Cawangan"].ToString();
-                        resultDBQuery["Personel"][0]["Balai"] = resultDBQuery_proses["Results"][0]["Balai"].ToString();
-                        resultDBQuery["Personel"][0]["Daerah"] = resultDBQuery_proses["Results"][0]["Daerah"].ToString();
-                        resultDBQuery["Personel"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
-                        resultDBQuery["Personel"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
-                        resultDBQuery["Personel"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["Personel"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    case "saman":
-                        resultDBQuery["Saman"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["Saman"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["Saman"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["Saman"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["Saman"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
-                        resultDBQuery["Saman"][0]["Tarikh Saman"] = resultDBQuery_proses["Results"][0]["Tarikh Saman"].ToString();
-                        resultDBQuery["Saman"][0]["Masa Saman"] = resultDBQuery_proses["Results"][0]["Masa Saman"].ToString();
-                        resultDBQuery["Saman"][0]["No.Saman"] = resultDBQuery_proses["Results"][0]["No.Saman"].ToString();
-                        resultDBQuery["Saman"][0]["Daerah"] = resultDBQuery_proses["Results"][0]["Daerah"].ToString();
-                        resultDBQuery["Saman"][0]["Kesalahan 1"] = resultDBQuery_proses["Results"][0]["Kesalahan 1"].ToString();
-                        resultDBQuery["Saman"][0]["Kesalahan 2"] = resultDBQuery_proses["Results"][0]["Kesalahan 2"].ToString();
-                        resultDBQuery["Saman"][0]["Kesalahan 3"] = resultDBQuery_proses["Results"][0]["Kesalahan 3"].ToString();
-                        resultDBQuery["Saman"][0]["Tempat Kesalahan"] = resultDBQuery_proses["Results"][0]["Tempat Kesalahan"].ToString();
-                        resultDBQuery["Saman"][0]["Kompaun"] = resultDBQuery_proses["Results"][0]["Kompaun"].ToString();
-                        resultDBQuery["Saman"][0]["Waran"] = resultDBQuery_proses["Results"][0]["Waran"].ToString();
-                        resultDBQuery["Saman"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["Saman"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    case "jim":
-                        resultDBQuery["Status"] = "ada";
-                        resultDBQuery["JIM"][0]["ResultStatus"] = "ada";
-                        resultDBQuery["JIM"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["JIM"][0]["No Dokumen"] = resultDBQuery_proses["Results"][0]["No Dokumen"].ToString();
-                        resultDBQuery["JIM"][0]["Tarikh Mula Passport"] = resultDBQuery_proses["Results"][0]["Tarikh Mula Passport"].ToString();
-                        resultDBQuery["JIM"][0]["Sebab Batal"] = resultDBQuery_proses["Results"][0]["Sebab Batal"].ToString();
-                        resultDBQuery["JIM"][0]["No Rujukan Pemilik"] = resultDBQuery_proses["Results"][0]["No Rujukan Pemilik"].ToString();
-                        resultDBQuery["JIM"][0]["Cawangan Mengeluar"] = resultDBQuery_proses["Results"][0]["Cawangan Mengeluar"].ToString();
-                        resultDBQuery["JIM"][0]["Sebab Sah"] = resultDBQuery_proses["Results"][0]["Sebab Sah"].ToString();
-                        resultDBQuery["JIM"][0]["Status Rekod"] = resultDBQuery_proses["Results"][0]["Status Rekod"].ToString();
-                        resultDBQuery["JIM"][0]["Jenis Dokumen"] = resultDBQuery_proses["Results"][0]["Jenis Dokumen"].ToString();
-                        resultDBQuery["JIM"][0]["No Siri Dokumen Terdahulu"] = resultDBQuery_proses["Results"][0]["No Siri Dokumen Terdahulu"].ToString();
-                        resultDBQuery["JIM"][0]["No Siri Dokumen"] = resultDBQuery_proses["Results"][0]["No Siri Dokumen"].ToString();
-                        resultDBQuery["JIM"][0]["No Dokumen Terdahulu"] = resultDBQuery_proses["Results"][0]["No Dokumen Terdahulu"].ToString();
-                        resultDBQuery["JIM"][0]["Tarikh Tamat Passport"] = resultDBQuery_proses["Results"][0]["Tarikh Tamat Passport"].ToString();
-                        resultDBQuery["JIM"][0]["Cawangan Memohon"] = resultDBQuery_proses["Results"][0]["Cawangan Memohon"].ToString();
-                        resultDBQuery["JIM"][0]["Tarikh Lahir"] = resultDBQuery_proses["Results"][0]["Tarikh Lahir"].ToString();
-                        resultDBQuery["JIM"][0]["No Pengenalan Semasa"] = resultDBQuery_proses["Results"][0]["No Pengenalan Semasa"].ToString();
-                        resultDBQuery["JIM"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
-                        resultDBQuery["JIM"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                        resultDBQuery["JIM"][0]["Nama Dicetak"] = resultDBQuery_proses["Results"][0]["Nama Dicetak"].ToString();
-                        resultDBQuery["JIM"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                        resultDBQuery["JIM"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                        break;
-                    default:
-                        break;
+                            break;
+                        case "jpjic":
+                            resultDBQuery["Status"] = "ada";
+                            resultDBQuery["JPJIC"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["JPJIC"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["JPJIC"][0]["No.Kenderaan"] = resultDBQuery_proses["Results"][0]["No.Kenderaan"].ToString();
+                            resultDBQuery["JPJIC"][0]["Model"] = resultDBQuery_proses["Results"][0]["Model"].ToString();
+                            resultDBQuery["JPJIC"][0]["Tarikh Model"] = resultDBQuery_proses["Results"][0]["Tarikh Model"].ToString();
+                            resultDBQuery["JPJIC"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["JPJIC"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "jpj":
+                            resultDBQuery["JPJ"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["JPJ"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["JPJ"][0]["No KP/Paspot"] = resultDBQuery_proses["Results"][0]["No KP/Paspot"].ToString();
+                            resultDBQuery["JPJ"][0]["Kategori"] = resultDBQuery_proses["Results"][0]["Kategori"].ToString();
+                            resultDBQuery["JPJ"][0]["Alamat"] = resultDBQuery_proses["Results"][0]["Alamat"].ToString();
+                            resultDBQuery["JPJ"][0]["No Pendaftaran Lama"] = resultDBQuery_proses["Results"][0]["No Pendaftaran Kenderaan"].ToString();
+                            resultDBQuery["JPJ"][0]["No Chasis"] = resultDBQuery_proses["Results"][0]["No Chasis"].ToString();
+                            resultDBQuery["JPJ"][0]["Jenis Badan"] = resultDBQuery_proses["Results"][0]["Jenis Badan"].ToString();
+                            resultDBQuery["JPJ"][0]["No Enjin"] = resultDBQuery_proses["Results"][0]["No Enjin"].ToString();
+                            resultDBQuery["JPJ"][0]["Kuasa Enjin"] = resultDBQuery_proses["Results"][0]["Kuasa Enjin"].ToString();
+                            resultDBQuery["JPJ"][0]["Model"] = resultDBQuery_proses["Results"][0]["Model"].ToString();
+                            resultDBQuery["JPJ"][0]["Tahun Keluaran Model"] = resultDBQuery_proses["Results"][0]["Tahun Keluaran Model"].ToString();
+                            resultDBQuery["JPJ"][0]["Warna"] = resultDBQuery_proses["Results"][0]["Warna"].ToString();
+                            resultDBQuery["JPJ"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
+                            resultDBQuery["JPJ"][0]["Kod Kegunaan"] = resultDBQuery_proses["Results"][0]["Kod Kegunaan"].ToString();
+                            resultDBQuery["JPJ"][0]["Tarikh Daftar"] = resultDBQuery_proses["Results"][0]["Tarikh Daftar"].ToString();
+                            resultDBQuery["JPJ"][0]["No LKM"] = resultDBQuery_proses["Results"][0]["No LKM"].ToString();
+                            resultDBQuery["JPJ"][0]["Tempoh LKM"] = resultDBQuery_proses["Results"][0]["Tempoh LKM"].ToString();
+                            resultDBQuery["JPJ"][0]["Syarikat Insurans"] = resultDBQuery_proses["Results"][0]["Syarikat Insurans"].ToString();
+                            resultDBQuery["JPJ"][0]["No Polisi"] = resultDBQuery_proses["Results"][0]["No Polisi"].ToString();
+                            resultDBQuery["JPJ"][0]["Tempoh Insurans"] = resultDBQuery_proses["Results"][0]["Tempoh Insurans"].ToString();
+                            resultDBQuery["JPJ"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["JPJ"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "orangdkhd": 
+                            resultDBQuery["OrangDikehendaki"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["OrangDikehendaki"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["No.Laporan"] = resultDBQuery_proses["Results"][0]["No.Laporan"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["IPD"] = resultDBQuery_proses["Results"][0]["IPD"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Kontinjen"] = resultDBQuery_proses["Results"][0]["Kontinjen"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Akta Kesalahan"] = resultDBQuery_proses["Results"][0]["Akta Kesalahan"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Photo"] = resultDBQuery_proses["Results"][0]["Photo"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Pegawai Penyiasat"] = resultDBQuery_proses["Results"][0]["Pegawai Penyiasat"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["Tarikh Report"] = resultDBQuery_proses["Results"][0]["Tarikh Report"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["OrangDikehendaki"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            strInput = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
+                            bytes = new byte[strInput.Length / 2];
+                            for (var i = 0; i < bytes.Length; i++)
+                            {
+                                bytes[i] = Convert.ToByte(strInput.Substring(i * 2, 2), 16);
+                            }
+                            base64input = Convert.ToBase64String(bytes);
+                            resultDBQuery["OrangDikehendaki"][0]["PhotoHex"] = base64input;
+                            break;
+                        case "oranghilang":
+                            resultDBQuery["OrangHilang"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["OrangHilang"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Bangsa"] = resultDBQuery_proses["Results"][0]["Bangsa"].ToString();
+                            resultDBQuery["OrangHilang"][0]["No Laporan"] = resultDBQuery_proses["Results"][0]["No Laporan"].ToString();
+                            resultDBQuery["OrangHilang"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Gambar"] = resultDBQuery_proses["Results"][0]["Gambar"].ToString();
+                            resultDBQuery["OrangHilang"][0]["Balai Polis"] = resultDBQuery_proses["Results"][0]["Balai Polis"].ToString();
+                            resultDBQuery["OrangHilang"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["OrangHilang"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "kenderaanhilang":
+                            resultDBQuery["KenderaanHilang"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["KenderaanHilang"][0]["No.Laporan"] = resultDBQuery_proses["Results"][0]["No.Laporan"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Balai"] = resultDBQuery_proses["Results"][0]["Balai"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Tarikh Laporan"] = resultDBQuery_proses["Results"][0]["Tarikh Laporan"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Jenis"] = resultDBQuery_proses["Results"][0]["Jenis"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Model/Tahun Buatan"] = resultDBQuery_proses["Results"][0]["Model/Tahun Buatan"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Warna"] = resultDBQuery_proses["Results"][0]["Warna"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Pegawai Penyiasat"] = resultDBQuery_proses["Results"][0]["Pegawai Penyiasat"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["No Pendaftaran Kenderaan"] = resultDBQuery_proses["Results"][0]["No Pendaftaran Kenderaan"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["No Chasis"] = resultDBQuery_proses["Results"][0]["No Chasis"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["No Enjin"] = resultDBQuery_proses["Results"][0]["No Enjin"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Recovery Indicator"] = resultDBQuery_proses["Results"][0]["Recovery Indicator"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Recovery Report No"] = resultDBQuery_proses["Results"][0]["Recovery Report No"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Interim"] = resultDBQuery_proses["Results"][0]["Interim"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["Kenderaan Dicuri Di Malaysia"] = resultDBQuery_proses["Results"][0]["Kenderaan Dicuri Di Malaysia"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["KenderaanHilang"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "personal":
+                            resultDBQuery["Personel"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["Personel"][0]["Name"] = resultDBQuery_proses["Results"][0]["Name"].ToString();
+                            resultDBQuery["Personel"][0]["No.Polis"] = resultDBQuery_proses["Results"][0]["No.Polis"].ToString();
+                            resultDBQuery["Personel"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
+                            resultDBQuery["Personel"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
+                            resultDBQuery["Personel"][0]["Bangsa/Keturunan"] = resultDBQuery_proses["Results"][0]["Bangsa/Keturunan"].ToString();
+                            resultDBQuery["Personel"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            resultDBQuery["Personel"][0]["Pangkat Hakiki"] = resultDBQuery_proses["Results"][0]["Pangkat Hakiki"].ToString();
+                            resultDBQuery["Personel"][0]["Jawatan"] = resultDBQuery_proses["Results"][0]["Jawatan"].ToString();
+                            resultDBQuery["Personel"][0]["Balai"] = resultDBQuery_proses["Results"][0]["Balai"].ToString();
+                            resultDBQuery["Personel"][0]["Daerah"] = resultDBQuery_proses["Results"][0]["Daerah"].ToString();
+                            resultDBQuery["Personel"][0]["Kontigen"] = resultDBQuery_proses["Results"][0]["Kontigen"].ToString();
+                            resultDBQuery["Personel"][0]["Status"] = resultDBQuery_proses["Results"][0]["Status"].ToString();
+                            resultDBQuery["Personel"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["Personel"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "saman":
+                            resultDBQuery["Saman"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["Saman"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["Saman"][0]["No.Kad Pengenalan"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan"].ToString();
+                            resultDBQuery["Saman"][0]["Tarikh Saman"] = resultDBQuery_proses["Results"][0]["Tarikh Saman"].ToString();
+                            resultDBQuery["Saman"][0]["Masa Saman"] = resultDBQuery_proses["Results"][0]["Masa Saman"].ToString();
+                            resultDBQuery["Saman"][0]["No.Saman"] = resultDBQuery_proses["Results"][0]["No.Saman"].ToString();
+                            resultDBQuery["Saman"][0]["Daerah"] = resultDBQuery_proses["Results"][0]["Daerah"].ToString();
+                            resultDBQuery["Saman"][0]["Kesalahan 1"] = resultDBQuery_proses["Results"][0]["Kesalahan 1"].ToString();
+                            resultDBQuery["Saman"][0]["Kesalahan 2"] = resultDBQuery_proses["Results"][0]["Kesalahan 2"].ToString();
+                            resultDBQuery["Saman"][0]["Kesalahan 3"] = resultDBQuery_proses["Results"][0]["Kesalahan 3"].ToString();
+                            resultDBQuery["Saman"][0]["Tempat Kesalahan"] = resultDBQuery_proses["Results"][0]["Tempat Kesalahan"].ToString();
+                            resultDBQuery["Saman"][0]["Kompaun"] = resultDBQuery_proses["Results"][0]["Kompaun"].ToString();
+                            resultDBQuery["Saman"][0]["Waran"] = resultDBQuery_proses["Results"][0]["Waran"].ToString();
+                            resultDBQuery["Saman"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["Saman"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        case "jim":
+                            resultDBQuery["Status"] = "ada";
+                            resultDBQuery["JIM"][0]["ResultStatus"] = "ada";
+                            resultDBQuery["JIM"][0]["No Dokumen"] = resultDBQuery_proses["Results"][0]["No Dokumen"].ToString();
+                            resultDBQuery["JIM"][0]["Tarikh Mula Passport"] = resultDBQuery_proses["Results"][0]["Tarikh Mula Passport"].ToString();
+                            resultDBQuery["JIM"][0]["Sebab Batal"] = resultDBQuery_proses["Results"][0]["Sebab Batal"].ToString();
+                            resultDBQuery["JIM"][0]["No Rujukan Pemilik"] = resultDBQuery_proses["Results"][0]["No Rujukan Pemilik"].ToString();
+                            resultDBQuery["JIM"][0]["Cawangan Mengeluar"] = resultDBQuery_proses["Results"][0]["Cawangan Mengeluar"].ToString();
+                            resultDBQuery["JIM"][0]["Sebab Sah"] = resultDBQuery_proses["Results"][0]["Sebab Sah"].ToString();
+                            resultDBQuery["JIM"][0]["Status Rekod"] = resultDBQuery_proses["Results"][0]["Status Rekod"].ToString();
+                            resultDBQuery["JIM"][0]["Jenis Dokumen"] = resultDBQuery_proses["Results"][0]["Jenis Dokumen"].ToString();
+                            resultDBQuery["JIM"][0]["No Siri Dokumen Terdahulu"] = resultDBQuery_proses["Results"][0]["No Siri Dokumen Terdahulu"].ToString();
+                            resultDBQuery["JIM"][0]["No Siri Dokumen"] = resultDBQuery_proses["Results"][0]["No Siri Dokumen"].ToString();
+                            resultDBQuery["JIM"][0]["No Dokumen Terdahulu"] = resultDBQuery_proses["Results"][0]["No Dokumen Terdahulu"].ToString();
+                            resultDBQuery["JIM"][0]["Tarikh Tamat Passport"] = resultDBQuery_proses["Results"][0]["Tarikh Tamat Passport"].ToString();
+                            resultDBQuery["JIM"][0]["Cawangan Memohon"] = resultDBQuery_proses["Results"][0]["Cawangan Memohon"].ToString();
+                            resultDBQuery["JIM"][0]["Tarikh Lahir"] = resultDBQuery_proses["Results"][0]["Tarikh Lahir"].ToString();
+                            resultDBQuery["JIM"][0]["No Pengenalan Semasa"] = resultDBQuery_proses["Results"][0]["No Pengenalan Semasa"].ToString();
+                            resultDBQuery["JIM"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            resultDBQuery["JIM"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
+                            resultDBQuery["JIM"][0]["Nama Dicetak"] = resultDBQuery_proses["Results"][0]["Nama Dicetak"].ToString();
+                            resultDBQuery["JIM"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
+                            resultDBQuery["JIM"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
-            Loop Tamat */
 
             return Ok(resultDBQuery);
         }
