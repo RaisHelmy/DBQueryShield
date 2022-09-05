@@ -1,8 +1,6 @@
 ﻿using DBQuery.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Pipelines;
 using System.Text.Json.Nodes;
@@ -60,13 +58,7 @@ namespace DBQuery.Controllers
         [
             {
                 ""ResultStatus"": ""tiada"",
-                ""No.Kenderaan"": """",
-                ""Model"": """",
-                ""Tarikh Model"": """",
-                ""type"": ""JPJIC"",
-                ""QueryStartTime"": """",
-                ""QueryEndTime"": """",
-                ""TypeDescription"": ""JPJIC""
+                ""Results"": """"
             }
         ],
     ""JPJ"":
@@ -259,9 +251,9 @@ namespace DBQuery.Controllers
             bool a = String.IsNullOrEmpty(tempNode.ToString()); */
 
             //Dapatkan data daripada DBQuery
-            //var servicesParam = new string[] { "jpn", "jpjic",  "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "personal", "saman", "jim" };
+            //var servicesParam = new string[] { "saman", "jim" };
             // BAHAYA!!!!!!! "kenderaanhilang" jpjic // JAAANGANNN GUNA NI : SAMAN 
-            string[] servicesParam = { "jpn", "jpj" }; //, "oranghilang", "kenderaanhilang", "personal", "jim" }; //, "jpjic", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "kenderaanhilang", "personal", "saman", "jim" };
+            string[] servicesParam = { "jpn", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "personal", "jpjic" }; //, "oranghilang", "kenderaanhilang", "personal", "jim" }; //, "jpjic", "jpj", "orangdkhd", "oranghilang", "kenderaanhilang", "kenderaanhilang", "personal", "saman", "jim" };
             //var servicesParam = new string[] { "jpn" };
             //string? dbqueryresult = null;
             Console.WriteLine($"Receiving Userinfo: UserTest Querying for {Query}");
@@ -418,12 +410,17 @@ namespace DBQuery.Controllers
                         case "jpjic":
                             resultDBQuery["Status"] = "ada";
                             resultDBQuery["JPJIC"][0]["ResultStatus"] = "ada";
-                            resultDBQuery["JPJIC"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
+                            //JsonNode? weatherForecast = 
+                            resultDBQuery["JPJIC"][0]["Results"] = JsonSerializer.Deserialize<JsonNode>(resultDBQuery_proses["Results"].ToJsonString());
+                            
+
+
+                            /*resultDBQuery["JPJIC"][0]["Nama"] = resultDBQuery_proses["Results"][0]["Nama"].ToString();
                             resultDBQuery["JPJIC"][0]["No.Kenderaan"] = resultDBQuery_proses["Results"][0]["No.Kenderaan"].ToString();
                             resultDBQuery["JPJIC"][0]["Model"] = resultDBQuery_proses["Results"][0]["Model"].ToString();
                             resultDBQuery["JPJIC"][0]["Tarikh Model"] = resultDBQuery_proses["Results"][0]["Tarikh Model"].ToString();
                             resultDBQuery["JPJIC"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
-                            resultDBQuery["JPJIC"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
+                            resultDBQuery["JPJIC"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();*/
                             break;
                         case "jpj":
                             resultDBQuery["JPJ"][0]["ResultStatus"] = "ada";
@@ -468,14 +465,20 @@ namespace DBQuery.Controllers
                             resultDBQuery["OrangDikehendaki"][0]["Tarikh Report"] = resultDBQuery_proses["Results"][0]["Tarikh Report"].ToString();
                             resultDBQuery["OrangDikehendaki"][0]["QueryStartTime"] = resultDBQuery_proses["Results"][0]["QueryStartTime"].ToString();
                             resultDBQuery["OrangDikehendaki"][0]["QueryEndTime"] = resultDBQuery_proses["Results"][0]["QueryEndTime"].ToString();
-                            strInput = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
-                            bytes = new byte[strInput.Length / 2];
-                            for (var i = 0; i < bytes.Length; i++)
-                            {
-                                bytes[i] = Convert.ToByte(strInput.Substring(i * 2, 2), 16);
-                            }
-                            base64input = Convert.ToBase64String(bytes);
-                            resultDBQuery["OrangDikehendaki"][0]["PhotoHex"] = base64input;
+                            //resultDBQuery["OrangDikehendaki"][0]["PhotoHex"] = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
+                            //string strInput = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
+                            if(resultDBQuery_proses["Results"][0]["Photo"].ToString() != "0"){
+                                strInput = resultDBQuery_proses["Results"][0]["PhotoHex"].ToString();
+                                //var bytes = new byte[strInput.Length / 2];
+                                bytes = new byte[strInput.Length / 2];
+                                for (var i = 0; i < bytes.Length; i++)
+                                {
+                                    bytes[i] = Convert.ToByte(strInput.Substring(i * 2, 2), 16);
+                                }
+                                //string? base64input = Convert.ToBase64String(bytes);
+                                base64input = Convert.ToBase64String(bytes);
+                                resultDBQuery["OrangDikehendaki"][0]["PhotoHex"] = base64input;
+                            };
                             break;
                         case "oranghilang":
                             resultDBQuery["OrangHilang"][0]["ResultStatus"] = "ada";
@@ -576,7 +579,7 @@ namespace DBQuery.Controllers
                             break;
                     }
                 }
-            }
+            };
 
             return Ok(resultDBQuery);
         }
