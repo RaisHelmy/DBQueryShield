@@ -386,7 +386,11 @@ namespace DBQuery.Controllers
                             resultDBQuery["JPN"][0]["No.Kad Pengenalan Lama"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan Lama"].ToString();
                             resultDBQuery["JPN"][0]["Tarikh Lahir"] = resultDBQuery_proses["Results"][0]["Tarikh Lahir"].ToString();
                             resultDBQuery["JPN"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                            resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            //resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            //if(resultDBQuery_proses["Results"][0]["Agama"].ToString() == null){
+                            if (Array.Exists(resultDBQuery_proses["Results"][0].ToJsonString(), element => element == "Agama")) { 
+                                resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            };
                             resultDBQuery["JPN"][0]["Bangsa/Keturunan"] = resultDBQuery_proses["Results"][0]["Bangsa/Keturunan"].ToString();
                             resultDBQuery["JPN"][0]["Alamat Tetap"] = resultDBQuery_proses["Results"][0]["Alamat Tetap"].ToString();
                             resultDBQuery["JPN"][0]["Alamat Surat-menyurat"] = resultDBQuery_proses["Results"][0]["Alamat Surat-menyurat"].ToString();
