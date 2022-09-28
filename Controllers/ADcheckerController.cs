@@ -19,7 +19,7 @@ namespace ADchecker.Controllers
         [HttpGet]
         public IActionResult Get([FromHeader] string Name)
         {
-            return Ok("first");
+            //return Ok("first");
             //use Name
             Console.WriteLine($"Receiving Userinfo: {Name}");
             try

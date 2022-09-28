@@ -13,6 +13,8 @@ using System.Linq.Expressions;
 
 namespace DBQuery.Controllers
 {
+
+
     //[Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -20,8 +22,26 @@ namespace DBQuery.Controllers
     public class DBQueryController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string Query)
+        [Route("testUser")]
+        public async Task<IActionResult> GetAsync(string User)
         {
+            string[] arrayUser = { "cat@good", "test@good", "dog@good" };
+            bool testUser = Array.Exists(arrayUser, element => element == User);
+            Console.WriteLine(testUser);
+            return Ok(testUser);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync(string Query, string User)
+        {
+            string[] arrayUser = { "cat@good", "test@good", "dog@good" };
+            bool testUser = Array.Exists(arrayUser, element => element == User);
+            Console.WriteLine(testUser);
+            if (testUser == false)
+            {
+                return Ok();
+            };
             Query = Query.ToLower();
             string resultDBQuery_Asal =
 @"{
@@ -388,9 +408,9 @@ namespace DBQuery.Controllers
                             resultDBQuery["JPN"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
                             //resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
                             //if(resultDBQuery_proses["Results"][0]["Agama"].ToString() == null){
-                            if (Array.Exists(resultDBQuery_proses["Results"][0].ToJsonString(), element => element == "Agama")) { 
+                            /*if (Array.Exists(resultDBQuery_proses["Results"][0].ToJsonString(), element => element == "Agama")) { 
                                 resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
-                            };
+                            };*/
                             resultDBQuery["JPN"][0]["Bangsa/Keturunan"] = resultDBQuery_proses["Results"][0]["Bangsa/Keturunan"].ToString();
                             resultDBQuery["JPN"][0]["Alamat Tetap"] = resultDBQuery_proses["Results"][0]["Alamat Tetap"].ToString();
                             resultDBQuery["JPN"][0]["Alamat Surat-menyurat"] = resultDBQuery_proses["Results"][0]["Alamat Surat-menyurat"].ToString();
