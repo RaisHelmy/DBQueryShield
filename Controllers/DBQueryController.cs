@@ -35,14 +35,8 @@ namespace DBQuery.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string Query, string User)
+        public async Task<IActionResult> GetAsync(string Query)
         {
-            bool testUser = Array.Exists(arrayUser, element => element == User);
-            Console.WriteLine(testUser);
-            if (testUser == false)
-            {
-                return Ok();
-            };
             Query = Query.ToLower();
             string resultDBQuery_Asal =
 @"{
