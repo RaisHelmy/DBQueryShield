@@ -21,11 +21,13 @@ namespace DBQuery.Controllers
     [Produces("application/json")]
     public class DBQueryController : Controller
     {
+        string[] arrayUser = { "R11111@test01", "R11112@test02", "R11113@test03" };
+
         [HttpGet]
         [Route("testUser")]
         public async Task<IActionResult> GetAsync(string User)
         {
-            string[] arrayUser = { "cat@good", "test@good", "dog@good" };
+            
             bool testUser = Array.Exists(arrayUser, element => element == User);
             Console.WriteLine(testUser);
             return Ok(testUser);
@@ -35,7 +37,6 @@ namespace DBQuery.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(string Query, string User)
         {
-            string[] arrayUser = { "cat@good", "test@good", "dog@good" };
             bool testUser = Array.Exists(arrayUser, element => element == User);
             Console.WriteLine(testUser);
             if (testUser == false)
