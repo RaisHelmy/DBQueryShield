@@ -21,7 +21,7 @@ namespace DBQuery.Controllers
     [Produces("application/json")]
     public class DBQueryController : Controller
     {
-        string[] arrayUser = { "R11111@test01", "R11112@test02", "R11113@test03" };
+        string[] arrayUser = { "G12345@test01", "G12346@test02", "G12347@test03" };
 
         [HttpGet]
         [Route("testUser")]
