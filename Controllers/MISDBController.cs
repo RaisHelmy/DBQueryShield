@@ -1,17 +1,10 @@
 ﻿using DBQuery.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.IO.Pipelines;
 using System.Text.Json.Nodes;
 using System.Text.Json;
-using System.ComponentModel;
-using System;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.Extensions.Options;
-using System.Linq.Expressions;
 
-namespace DBQuery.Controllers
+namespace MISDB.Controllers
 {
 
 
