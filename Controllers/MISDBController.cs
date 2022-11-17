@@ -18,20 +18,15 @@ namespace MISDB.Controllers
     public class MISDBController : Controller
     {
         [HttpGet]
-        [Route("UserList")]
-        public async Task<IActionResult> GetAsync(int Page, int Row)
+        [Route("QueryHistory")]
+        public async Task<IActionResult> GetAsync(int Page, int Row, int? KontinjenId, int? DaerahId)
         {
             var QueryResults = new List<QueryResult>();
-            //to get the connection string 
-            //var _config = app.Services.GetRequiredService<IConfiguration>();
-            //var connectionstring = _config.GetConnectionString("DefaultConnection");
-            //build the sqlconnection and execute the sql command
-            //using (SqlConnection conn = new SqlConnection(connectionstring))
-            //{
-            //conn.Open(); 
-            int Offset = (Page - 1) * Row;  
-                string commandtext = "EXEC QueryHistoryDesc @Offset=" + Offset + ", @Row=" + Row;
+            int Offset = (Page - 1) * Row;
             
+                string commandtext = "EXEC QueryHistoryDesc " + Offset + ", " + Row;
+            //    string commandtext = "EXEC QueryUser " + Offset + ", " + Row;
+
             SqlConnection connectionMISDB = new SqlConnection("Data Source=C4iBA-MISDB.c4i.rmp.gov.my,49254; Initial Catalog=DBQueryLogSAT; User Id=sa; Password=P@ssw0rd=c4i");
             connectionMISDB.Open();
             SqlCommand cmd = new SqlCommand(commandtext, connectionMISDB);
@@ -65,35 +60,6 @@ namespace MISDB.Controllers
 
                     QueryResults.Add(QueryResultsQ);
                 }
-            //}
-            /*
-            try
-            {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-                builder.DataSource = "C4iBA-MISDB.c4i.rmp.gov.my\\MISDB";
-                builder.UserID = "sa";
-                builder.Password = "P@ssw0rd=c4i";
-                builder.InitialCatalog = "DBQueryLogSAT";
-
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
-                {
-                    Console.WriteLine("\nQuery data example:");
-                    Console.WriteLine("=========================================\n");
-
-                    connection.Open();
-
-                    String sql = "SELECT TOP (1000) [Id]\r\n      ,[PersonalId]\r\n      ,[Name]\r\n      ,[KontigenId]\r\n      ,[DaerahId]\r\n      ,[GroupId]\r\n      ,[Disabled]\r\n      ,[Rank]\r\n  FROM [DBQueryLogSAT].[dbo].[User] FOR JSON;";
-
-                }
-            }
-            catch (SqlException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            Console.WriteLine("\nDone. Press enter.");
-            Console.ReadLine();
-            */
             connectionMISDB.Close();
             return Ok(QueryResults);
         }

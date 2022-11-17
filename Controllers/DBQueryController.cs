@@ -35,6 +35,63 @@ namespace DBQuery.Controllers
         }
 
         [HttpGet]
+        [Route("Checkstatus")]
+        public async Task<IActionResult> GetAsync2()
+        {
+            string status =
+@"[
+  {
+    ""Type"": ""JPN"",
+    ""TypeDescription"": ""JPN"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""JPJ"",
+    ""TypeDescription"": ""JPJ"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""JPJIC"",
+    ""TypeDescription"": ""JPJ(IC)"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""OrangHilang"",
+    ""TypeDescription"": ""Orang Hilang"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""KenderaanHilang"",
+    ""TypeDescription"": ""Kenderaan Hilang"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""Personal"",
+    ""TypeDescription"": ""Personal"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""Saman"",
+    ""TypeDescription"": ""Saman"",
+    ""Status"": false
+  },
+  {
+    ""Type"": ""OrangDkhd"",
+    ""TypeDescription"": ""Orang Dikehendaki"",
+    ""Status"": true
+  },
+  {
+    ""Type"": ""JIM"",
+    ""TypeDescription"": ""JIM"",
+    ""Status"": false
+  }
+]
+";
+            return Ok(JsonNode.Parse(status)!);
+
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetAsync(string Query)
         {
             Query = Query.ToLower();
@@ -401,7 +458,7 @@ namespace DBQuery.Controllers
                             resultDBQuery["JPN"][0]["No.Kad Pengenalan Lama"] = resultDBQuery_proses["Results"][0]["No.Kad Pengenalan Lama"].ToString();
                             resultDBQuery["JPN"][0]["Tarikh Lahir"] = resultDBQuery_proses["Results"][0]["Tarikh Lahir"].ToString();
                             resultDBQuery["JPN"][0]["Jantina"] = resultDBQuery_proses["Results"][0]["Jantina"].ToString();
-                            //resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
+                            resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"]?.ToString();
                             //if(resultDBQuery_proses["Results"][0]["Agama"].ToString() == null){
                             /*if (Array.Exists(resultDBQuery_proses["Results"][0].ToJsonString(), element => element == "Agama")) { 
                                 resultDBQuery["JPN"][0]["Agama"] = resultDBQuery_proses["Results"][0]["Agama"].ToString();
